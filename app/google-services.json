@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "678509011414",
+    "firebase_url": "https://cloud-gallery-b02ec.firebaseio.com",
+    "project_id": "cloud-gallery-b02ec",
+    "storage_bucket": "cloud-gallery-b02ec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:678509011414:android:e5763c108dee2bc2",
+        "android_client_info": {
+          "package_name": "com.gulaxoft.cloudgallery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "678509011414-8hnbe2e4fn80sg2dldg72dafkc21h7tk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvI46QH_VITPUfnbNw2tHwAjYtPwEDctc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "678509011414-8hnbe2e4fn80sg2dldg72dafkc21h7tk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
