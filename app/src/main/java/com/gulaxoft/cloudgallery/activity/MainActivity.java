@@ -12,7 +12,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.gulaxoft.cloudgallery.Const;
 import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.entity.Category;
-import com.gulaxoft.cloudgallery.entity.Image;
 import com.gulaxoft.cloudgallery.fragment.CategoryDetailsFragment;
 import com.gulaxoft.cloudgallery.fragment.CategoryListFragment;
 
@@ -72,16 +71,12 @@ public class MainActivity extends AppCompatActivity implements Const {
 
     public void displayCategoryDetails(Category category) {
         CategoryDetailsFragment categoryDetailsFragment = new CategoryDetailsFragment();
+        categoryDetailsFragment.init(category);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.fragment, categoryDetailsFragment, CAT_DETAILS_FRAGMENT);
         ft.addToBackStack(CAT_DETAILS_FRAGMENT);
         ft.commit();
         setTitle(category.getName());
-    }
-
-    private void addImage(Image image, String categoryId) {
-        image.setId(mImagesRef.push().getKey());
-        mImagesRef.child(image.getId()).setValue(image);
     }
 
     public DatabaseReference getCategoriesRef() {

@@ -1,30 +1,55 @@
 package com.gulaxoft.cloudgallery.fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.gulaxoft.cloudgallery.Const;
 import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.activity.MainActivity;
+import com.gulaxoft.cloudgallery.entity.Category;
+import com.gulaxoft.cloudgallery.entity.Image;
+import com.gulaxoft.cloudgallery.util.FileUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Created by gos on 19.12.16.
  */
 
-public class CategoryDetailsFragment extends Fragment {
+public class CategoryDetailsFragment extends Fragment implements Const {
 
-    private DatabaseReference mImagesRef;
+    private DatabaseReference mImagesDataRef;
+    private StorageReference mImagesStorageRef;
+    private Category mCategory;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReferenceFromUrl(IMG_STORAGE_URL);
+        mImagesStorageRef = storageRef.child(IMAGES);
     }
 
     @Nullable
@@ -42,9 +67,117 @@ public class CategoryDetailsFragment extends Fragment {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_choose_a_photo:
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Choose an image"), REQ_CHOOSE_IMG);
+                break;
+            case R.id.action_make_a_photo:
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (cameraIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivityForResult(cameraIntent, REQ_MAKE_PHOTO);
+                }
+                break;
+        }
+        return true;
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         ((MainActivity) getActivity()).showBackButton();
-        mImagesRef = ((MainActivity) getActivity()).getImagesRef();
+        mImagesDataRef = ((MainActivity) getActivity()).getImagesRef();
+
+        // load all images of this category
+        ((MainActivity) getActivity()).getCategoriesRef().child(mCategory.getId()).child(IMAGES).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mCategory.getImages().clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    final String id = snapshot.getKey();
+                    mImagesDataRef.child(id).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Image image = dataSnapshot.getValue(Image.class);
+                            image.setId(id);
+                            if (mCategory.getImages().contains(image)) mCategory.getImages().remove(image);
+                            mCategory.getImages().add(image);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQ_MAKE_PHOTO && resultCode == Activity.RESULT_OK) {
+            Bundle extras = data.getExtras();
+
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            byte[] bmpData = FileUtils.bitmapToByteArray(imageBitmap);
+
+            Image image = new Image();
+            image.setFormat(".jpg");
+            image.setTimestamp(System.currentTimeMillis());
+            image.setId(mImagesDataRef.push().getKey());
+            String time = DateFormat.format("dd-MM-yyyy HH:mm:ss", image.getTimestamp()).toString();
+            image.setName(IMG_PREFIX.concat(time));
+
+            postImage(image);
+
+            mImagesStorageRef.child(image.getFileName()).putBytes(bmpData);
+        } else if (requestCode == REQ_CHOOSE_IMG && resultCode == Activity.RESULT_OK) {
+            Uri uri = data.getData();
+//          Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+//          byte[] bmpData = FileUtils.bitmapToByteArray(imageBitmap);
+            String path = FileUtils.getPath(getActivity(), uri);
+
+            Image image = new Image();
+            image.setFormat(FileUtils.getFileExtension(path));
+            image.setTimestamp(System.currentTimeMillis());
+            image.setId(mImagesDataRef.push().getKey());
+            image.setName(FileUtils.getFileName(path));
+
+            postImage(image);
+            mImagesStorageRef.child(image.getFileName()).putFile(uri);
+        }
+    }
+
+    public void init(Category category) {
+        this.mCategory = category;    }
+
+    public void postImage(Image image) {
+        mImagesDataRef.child(image.getId()).setValue(image);
+        mCategory.getImages().add(image);
+        updateCategory();
+    }
+
+    private void updateCategory() {
+        Map<String, Object> catUpdates = new HashMap<>();
+        catUpdates.put(CAT_NAME, mCategory.getName());
+        catUpdates.put(CAT_DESC, mCategory.getDescription());
+        catUpdates.put(CAT_LAST, mCategory.getLastAddedImage() != null
+                ? mCategory.getLastAddedImage().getTimestamp() : 0);
+        Map<String, Object> imagesLinks = new HashMap<>();
+        for (String imageId : mCategory.getImagesIds()) {
+            imagesLinks.put(imageId, true);
+        }
+        catUpdates.put(IMAGES, imagesLinks);
+
+        ((MainActivity) getActivity()).getCategoriesRef().child(mCategory.getId()).updateChildren(catUpdates);
     }
 }

@@ -87,12 +87,12 @@ public class CategoryListFragment extends Fragment implements Const {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQ_ADD_CATEGORY && resultCode == RESULT_OK) {
             Category category = data.getParcelableExtra(EXTRA_CATEGORY);
-            addCategory(category);
+            postCategory(category);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void addCategory(Category category) {
+    private void postCategory(Category category) {
         category.setId(mCategoriesRef.push().getKey());
         Map<String, Object> catUpdates = new HashMap<>();
         catUpdates.put(CAT_NAME, category.getName());

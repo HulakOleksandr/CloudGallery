@@ -62,4 +62,9 @@ public class Image implements Comparable<Image>, Parcelable {
         timestamp = src.readLong();
         format = src.readString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Image && id != null && ((Image) o).getId() != null && ((Image) o).getId().equals(id);
+    }
 }
