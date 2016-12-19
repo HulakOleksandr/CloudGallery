@@ -1,13 +1,11 @@
 package com.gulaxoft.cloudgallery.activity;
 
-import android.content.Intent;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -15,15 +13,12 @@ import com.gulaxoft.cloudgallery.Const;
 import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.entity.Category;
 import com.gulaxoft.cloudgallery.entity.Image;
-import com.gulaxoft.cloudgallery.view.CategoryAdapter;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.gulaxoft.cloudgallery.fragment.CategoryDetailsFragment;
+import com.gulaxoft.cloudgallery.fragment.CategoryListFragment;
 
 public class MainActivity extends AppCompatActivity implements Const {
     private DatabaseReference mCategoriesRef;
     private DatabaseReference mImagesRef;
-    private final int REQ_ADD_CATEGORY = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,35 +32,51 @@ public class MainActivity extends AppCompatActivity implements Const {
         mCategoriesRef = FirebaseDatabase.getInstance().getReference(CATEGORIES);
         mImagesRef = FirebaseDatabase.getInstance().getReference(IMAGES);
 
-        CategoryAdapter adapter = new CategoryAdapter(mCategoriesRef);
-
-        RecyclerView rvCategories = (RecyclerView) findViewById(R.id.rv_categories);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setReverseLayout(false);
-
-        rvCategories.setHasFixedSize(false);
-        rvCategories.setLayoutManager(layoutManager);
-        rvCategories.setAdapter(adapter);
+        if (savedInstanceState == null) {
+            CategoryListFragment categoryListFragment = new CategoryListFragment();
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.add(R.id.fragment, categoryListFragment, CAT_LIST_FRAGMENT);
+            ft.commit();
+        }
     }
 
-    private void addCategory(Category category) {
-        category.setId(mCategoriesRef.push().getKey());
-        Map<String, Object> catUpdates = new HashMap<>();
-        catUpdates.put(CAT_NAME, category.getName());
-        catUpdates.put(CAT_DESC, category.getDescription());
-        catUpdates.put(CAT_LAST, category.getLastAddedImage() != null
-                ? category.getLastAddedImage().getTimestamp() : 0);
-        Map<String, Object> imagesLinks = new HashMap<>();
-        for (String imageId : category.getImagesIds()) {
-            imagesLinks.put(imageId, true);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        catUpdates.put(IMAGES, imagesLinks);
+    }
 
-        mCategoriesRef.child(category.getId()).updateChildren(catUpdates);
-
-        for (Image img : category.getImages()) {
-            addImage(img, "remove it");
+    @Override
+    public void onBackPressed() {
+        CategoryDetailsFragment detailsFragment = (CategoryDetailsFragment) getFragmentManager().findFragmentByTag(CAT_DETAILS_FRAGMENT);
+        if (detailsFragment != null && detailsFragment.isVisible()) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            setTitle(getString(R.string.app_name));
         }
+        super.onBackPressed();
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        ((TextView) findViewById(R.id.toolbar_title)).setText(title);
+    }
+
+    public void showBackButton() {
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    public void displayCategoryDetails(Category category) {
+        CategoryDetailsFragment categoryDetailsFragment = new CategoryDetailsFragment();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.replace(R.id.fragment, categoryDetailsFragment, CAT_DETAILS_FRAGMENT);
+        ft.addToBackStack(CAT_DETAILS_FRAGMENT);
+        ft.commit();
+        setTitle(category.getName());
     }
 
     private void addImage(Image image, String categoryId) {
@@ -73,32 +84,11 @@ public class MainActivity extends AppCompatActivity implements Const {
         mImagesRef.child(image.getId()).setValue(image);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    public DatabaseReference getCategoriesRef() {
+        return mCategoriesRef;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.action_add_category:
-                Intent intent = new Intent(this, AddCategoryActivity.class);
-                startActivityForResult(intent, REQ_ADD_CATEGORY);
-                break;
-            default:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQ_ADD_CATEGORY && resultCode == RESULT_OK) {
-            Category category = data.getParcelableExtra(EXTRA_CATEGORY);
-            addCategory(category);
-        }
-        super.onActivityResult(requestCode, resultCode, data);
+    public DatabaseReference getImagesRef() {
+        return mImagesRef;
     }
 }

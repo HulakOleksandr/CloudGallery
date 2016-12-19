@@ -1,4 +1,4 @@
-package com.gulaxoft.cloudgallery.view;
+package com.gulaxoft.cloudgallery.uihelper;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +13,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.gulaxoft.cloudgallery.Const;
 import com.gulaxoft.cloudgallery.R;
+import com.gulaxoft.cloudgallery.activity.MainActivity;
 import com.gulaxoft.cloudgallery.entity.Category;
 
 import java.util.ArrayList;
@@ -25,9 +26,10 @@ import java.util.Date;
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> implements Const {
 
     private ArrayList<Category> items = new ArrayList<>();
+    private MainActivity mActivity; // TODO refactor to remove this link
     private Context mContext;
 
-    public CategoryAdapter(DatabaseReference ref) {
+    public CategoryAdapter(DatabaseReference ref, MainActivity activity) {
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -49,6 +51,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> im
                 Log.w(TAG, "Read Category failed: " + databaseError.getMessage());
             }
         });
+        mActivity = activity;
     }
 
     @Override
@@ -68,7 +71,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> im
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO open activity with category details and request its images from Firebase in it
+                mActivity.displayCategoryDetails(category);
             }
         });
     }

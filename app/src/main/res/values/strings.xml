@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Cloud Gallery</string>
     <string name="add_category">Add new category</string>
+    <string name="add_image">Add new image</string>
 </resources>
