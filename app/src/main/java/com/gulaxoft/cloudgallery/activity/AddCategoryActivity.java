@@ -13,7 +13,6 @@ import android.widget.Toast;
 import com.gulaxoft.cloudgallery.Const;
 import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.entity.Category;
-import com.gulaxoft.cloudgallery.entity.Image;
 
 public class AddCategoryActivity extends AppCompatActivity implements Const {
 
@@ -45,8 +44,6 @@ public class AddCategoryActivity extends AppCompatActivity implements Const {
                 Category category = new Category();
                 category.setName(name);
                 category.setDescription(description);
-                category.getImages().add(new Image("da", "img1", 1414141, ".png"));
-                category.getImages().add(new Image("net", "img2", 1500000, ".jpg"));
 
                 Intent intent = new Intent();
                 intent.putExtra(EXTRA_CATEGORY, category);

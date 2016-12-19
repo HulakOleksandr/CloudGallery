@@ -27,6 +27,9 @@ public class MainActivity extends AppCompatActivity implements Const {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        if (savedInstanceState == null) {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        }
 
         mCategoriesRef = FirebaseDatabase.getInstance().getReference(CATEGORIES);
         mImagesRef = FirebaseDatabase.getInstance().getReference(IMAGES);

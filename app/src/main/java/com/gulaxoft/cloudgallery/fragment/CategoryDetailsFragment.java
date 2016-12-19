@@ -8,6 +8,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,17 +19,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.gulaxoft.cloudgallery.Const;
 import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.activity.MainActivity;
 import com.gulaxoft.cloudgallery.entity.Category;
 import com.gulaxoft.cloudgallery.entity.Image;
+import com.gulaxoft.cloudgallery.uihelper.GalleryAdapter;
 import com.gulaxoft.cloudgallery.util.FileUtils;
 
 import java.util.HashMap;
@@ -42,6 +48,7 @@ public class CategoryDetailsFragment extends Fragment implements Const {
     private DatabaseReference mImagesDataRef;
     private StorageReference mImagesStorageRef;
     private Category mCategory;
+    private GalleryAdapter mGalleryAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +57,10 @@ public class CategoryDetailsFragment extends Fragment implements Const {
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReferenceFromUrl(IMG_STORAGE_URL);
         mImagesStorageRef = storageRef.child(IMAGES);
+
+        if (savedInstanceState != null) {
+            mCategory = savedInstanceState.getParcelable(EXTRA_CATEGORY);
+        }
     }
 
     @Nullable
@@ -105,6 +116,7 @@ public class CategoryDetailsFragment extends Fragment implements Const {
                             image.setId(id);
                             if (mCategory.getImages().contains(image)) mCategory.getImages().remove(image);
                             mCategory.getImages().add(image);
+                            mGalleryAdapter.notifyDataSetChanged();
                         }
 
                         @Override
@@ -120,6 +132,14 @@ public class CategoryDetailsFragment extends Fragment implements Const {
 
             }
         });
+
+        RecyclerView recyclerView = (RecyclerView) getActivity().findViewById(R.id.rv_images_of_category);
+        mGalleryAdapter = new GalleryAdapter(getActivity(), mCategory.getImages(), mImagesStorageRef);
+
+        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 2);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mGalleryAdapter);
     }
 
     @Override
@@ -139,11 +159,16 @@ public class CategoryDetailsFragment extends Fragment implements Const {
 
             postImage(image);
 
-            mImagesStorageRef.child(image.getFileName()).putBytes(bmpData);
+            UploadTask uploadTask = mImagesStorageRef.child(image.getFileName()).putBytes(bmpData);
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    mGalleryAdapter.notifyDataSetChanged();
+                }
+            });
         } else if (requestCode == REQ_CHOOSE_IMG && resultCode == Activity.RESULT_OK) {
+            // TODO compress big images
             Uri uri = data.getData();
-//          Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
-//          byte[] bmpData = FileUtils.bitmapToByteArray(imageBitmap);
             String path = FileUtils.getPath(getActivity(), uri);
 
             Image image = new Image();
@@ -153,12 +178,25 @@ public class CategoryDetailsFragment extends Fragment implements Const {
             image.setName(FileUtils.getFileName(path));
 
             postImage(image);
-            mImagesStorageRef.child(image.getFileName()).putFile(uri);
+            UploadTask uploadTask = mImagesStorageRef.child(image.getFileName()).putFile(uri);
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    mGalleryAdapter.notifyDataSetChanged();
+                }
+            });
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelable(EXTRA_CATEGORY, mCategory);
+        super.onSaveInstanceState(outState);
+    }
+
     public void init(Category category) {
-        this.mCategory = category;    }
+        this.mCategory = category;
+    }
 
     public void postImage(Image image) {
         mImagesDataRef.child(image.getId()).setValue(image);
@@ -179,5 +217,6 @@ public class CategoryDetailsFragment extends Fragment implements Const {
         catUpdates.put(IMAGES, imagesLinks);
 
         ((MainActivity) getActivity()).getCategoriesRef().child(mCategory.getId()).updateChildren(catUpdates);
+        mGalleryAdapter.notifyDataSetChanged();
     }
 }
