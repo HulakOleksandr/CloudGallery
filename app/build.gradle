@@ -25,8 +25,12 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:recyclerview-v7:23.4.0'
     compile 'com.google.firebase:firebase-database:10.0.1'
     compile 'com.google.firebase:firebase-storage:10.0.1'
+    compile 'com.firebaseui:firebase-ui-database:1.0.1'
+    compile 'com.firebaseui:firebase-ui-storage:1.0.1'
+    compile 'org.projectlombok:lombok:1.16.10'
     testCompile 'junit:junit:4.12'
 }
 
