@@ -4,16 +4,24 @@
     android:id="@+id/activity_add_category"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.gulaxoft.cloudgallery.AddCategoryActivity">
+    tools:context="com.gulaxoft.cloudgallery.activity.AddCategoryActivity">
 
-    <include
-        android:id="@+id/toolbar_add_category"
-        layout="@layout/toolbar_add_category" />
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/appBar">
+
+        <include
+            android:id="@+id/toolbar_add_category"
+            layout="@layout/toolbar_add_category" />
+
+    </android.support.design.widget.AppBarLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar_add_category"
+        android:layout_below="@+id/appBar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_marginLeft="30dp"

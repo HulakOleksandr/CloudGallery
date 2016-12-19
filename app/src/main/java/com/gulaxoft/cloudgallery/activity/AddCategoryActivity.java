@@ -1,4 +1,4 @@
-package com.gulaxoft.cloudgallery;
+package com.gulaxoft.cloudgallery.activity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,6 +10,8 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.gulaxoft.cloudgallery.Const;
+import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.entity.Category;
 import com.gulaxoft.cloudgallery.entity.Image;
 

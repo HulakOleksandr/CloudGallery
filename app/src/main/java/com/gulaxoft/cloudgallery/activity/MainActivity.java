@@ -1,4 +1,4 @@
-package com.gulaxoft.cloudgallery;
+package com.gulaxoft.cloudgallery.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,9 +11,14 @@ import android.view.MenuItem;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.gulaxoft.cloudgallery.Const;
+import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.entity.Category;
 import com.gulaxoft.cloudgallery.entity.Image;
 import com.gulaxoft.cloudgallery.view.CategoryAdapter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements Const {
     private DatabaseReference mCategoriesRef;
@@ -45,13 +50,18 @@ public class MainActivity extends AppCompatActivity implements Const {
 
     private void addCategory(Category category) {
         category.setId(mCategoriesRef.push().getKey());
-        mCategoriesRef.child(category.getId()).child(CAT_NAME).setValue(category.getName());
-        mCategoriesRef.child(category.getId()).child(CAT_DESC).setValue(category.getDescription());
-        mCategoriesRef.child(category.getId()).child(CAT_LAST).setValue(category.getLastAddedImage() != null
+        Map<String, Object> catUpdates = new HashMap<>();
+        catUpdates.put(CAT_NAME, category.getName());
+        catUpdates.put(CAT_DESC, category.getDescription());
+        catUpdates.put(CAT_LAST, category.getLastAddedImage() != null
                 ? category.getLastAddedImage().getTimestamp() : 0);
+        Map<String, Object> imagesLinks = new HashMap<>();
         for (String imageId : category.getImagesIds()) {
-            mCategoriesRef.child(category.getId()).child(IMAGES).child(imageId).setValue(true);
+            imagesLinks.put(imageId, true);
         }
+        catUpdates.put(IMAGES, imagesLinks);
+
+        mCategoriesRef.child(category.getId()).updateChildren(catUpdates);
 
         for (Image img : category.getImages()) {
             addImage(img, "remove it");
