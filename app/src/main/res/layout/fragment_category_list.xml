@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.gulaxoft.cloudgallery.activity.MainActivity"
+    android:paddingTop="?attr/actionBarSize"
     tools:showIn="@layout/activity_main">
 
     <android.support.v7.widget.RecyclerView
@@ -12,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:paddingTop="?attr/actionBarSize"
         android:scrollbars="vertical"/>
 
 </RelativeLayout>
