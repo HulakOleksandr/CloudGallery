@@ -87,38 +87,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ImageHol
             }
         });
 
-//        // TODO Fix fullscreen viewing
-//        holder.thumbnail.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                try {
-//                    v.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-//                            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-//                    v.layout(0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
-//                    v.buildDrawingCache(true);
-//                    Bitmap bitmap = v.getDrawingCache(true).copy(Bitmap.Config.RGB_565, false);
-//                    v.destroyDrawingCache();
-//
-//                    holder.thumbnail.setImageBitmap(bitmap);
-//
-//                    FileOutputStream fos = new FileOutputStream(mContext.getCacheDir().getPath().concat("/").concat("fullScreenImage.jpg"));
-//                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-//                    fos.close();
-//
-//                    File file = new File(mContext.getCacheDir(), "fullScreenImage.jpg");
-//
-//                    Intent intent = new Intent();
-//                    intent.setAction(Intent.ACTION_VIEW);
-//                    intent.setDataAndType(Uri.fromFile(file), "image/*");
-//                    v.getContext().startActivity(intent);
-//
-//                } catch (ActivityNotFoundException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    Log.e(TAG, "Failed to create cache file for displaying image in fullscreen : " + e.getMessage());
-//                }
-//            }
-//        });
+//      TODO Fullscreen viewing
     }
 
     @Override

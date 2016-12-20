@@ -14,12 +14,14 @@
         android:id="@+id/tv_name"
         android:textSize="16sp"
         android:textStyle="bold"
+        android:textColor="@color/rvCategoryText"
         android:layout_marginBottom="10dp"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="14sp"
+        android:textColor="@color/rvCategoryText"
         android:id="@+id/tv_last_update"/>
 
 </LinearLayout>

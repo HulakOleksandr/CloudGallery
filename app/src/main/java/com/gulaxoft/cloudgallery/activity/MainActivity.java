@@ -18,6 +18,7 @@ import com.gulaxoft.cloudgallery.fragment.CategoryListFragment;
 public class MainActivity extends AppCompatActivity implements Const {
     private DatabaseReference mCategoriesRef;
     private DatabaseReference mImagesRef;
+    private static boolean calledAlready;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +28,9 @@ public class MainActivity extends AppCompatActivity implements Const {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        if (savedInstanceState == null) {
+        if (!calledAlready) {
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            calledAlready = true;
         }
 
         mCategoriesRef = FirebaseDatabase.getInstance().getReference(CATEGORIES);
@@ -84,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements Const {
         CategoryDetailsFragment categoryDetailsFragment = new CategoryDetailsFragment();
         categoryDetailsFragment.init(category);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         ft.replace(R.id.fragment, categoryDetailsFragment, CAT_DETAILS_FRAGMENT);
         ft.addToBackStack(CAT_DETAILS_FRAGMENT);
         ft.commit();

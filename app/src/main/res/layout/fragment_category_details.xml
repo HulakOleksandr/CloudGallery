@@ -12,12 +12,15 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp">
+        android:layout_margin="10dp"
+        android:padding="5dp"
+        android:background="@drawable/bg_overall">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tv_overall"
+            android:textColor="@color/rvCategoryText"
             android:layout_marginLeft="5dp"
             android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
@@ -30,6 +33,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/tv_last_image"
             android:text="@string/last"
+            android:textColor="@color/rvCategoryText"
             android:layout_below="@+id/tv_overall"
             android:layout_alignLeft="@+id/tv_overall"
             android:layout_alignStart="@+id/tv_overall"
@@ -41,6 +45,7 @@
             android:id="@+id/tv_last_image_name"
             android:ellipsize="end"
             android:maxLines="1"
+            android:textColor="@color/rvCategoryText"
             android:layout_below="@+id/tv_last_image"
             android:layout_alignLeft="@+id/tv_overall"
             android:layout_alignStart="@+id/tv_overall"
@@ -50,6 +55,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tv_last_image_date"
+            android:textColor="@color/rvCategoryText"
             android:layout_below="@+id/tv_last_image_name"
             android:layout_alignLeft="@+id/tv_overall"
             android:layout_alignStart="@+id/tv_overall" />
