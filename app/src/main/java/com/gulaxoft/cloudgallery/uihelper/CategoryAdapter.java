@@ -9,12 +9,12 @@ import android.view.ViewGroup;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.gulaxoft.cloudgallery.Const;
 import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.activity.MainActivity;
 import com.gulaxoft.cloudgallery.entity.Category;
+import com.gulaxoft.cloudgallery.util.GlobalData;
 
 import java.util.ArrayList;
 
@@ -27,8 +27,8 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> im
     private ArrayList<Category> items = new ArrayList<>();
     private MainActivity mActivity; // TODO refactor to remove this link
 
-    public CategoryAdapter(DatabaseReference ref, MainActivity activity) {
-        ref.addValueEventListener(new ValueEventListener() {
+    public CategoryAdapter(MainActivity activity) {
+        GlobalData.INSTANCE.getCategoriesRef().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 items.clear();

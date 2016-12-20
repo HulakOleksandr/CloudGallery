@@ -18,6 +18,7 @@ import com.gulaxoft.cloudgallery.Const;
 import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.entity.Image;
 import com.gulaxoft.cloudgallery.event.DeleteImageEvent;
+import com.gulaxoft.cloudgallery.util.GlobalData;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -50,10 +51,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ImageHol
         }
     }
 
-    public GalleryAdapter(Context context, List<Image> images, StorageReference imagesStorageRef) {
+    public GalleryAdapter(Context context, List<Image> images) {
         mContext = context;
         mImages = images;
-        mImagesStorageRef = imagesStorageRef;
+        mImagesStorageRef = GlobalData.INSTANCE.getImagesStorageRef();
     }
 
     @Override

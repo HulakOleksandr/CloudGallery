@@ -21,6 +21,7 @@ import com.gulaxoft.cloudgallery.activity.AddCategoryActivity;
 import com.gulaxoft.cloudgallery.activity.MainActivity;
 import com.gulaxoft.cloudgallery.entity.Category;
 import com.gulaxoft.cloudgallery.uihelper.CategoryAdapter;
+import com.gulaxoft.cloudgallery.util.GlobalData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -73,8 +74,8 @@ public class CategoryListFragment extends Fragment implements Const {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mCategoriesRef = ((MainActivity) getActivity()).getCategoriesRef();
-        CategoryAdapter adapter = new CategoryAdapter(mCategoriesRef, (MainActivity) getActivity());
+        mCategoriesRef = GlobalData.INSTANCE.getCategoriesRef();
+        CategoryAdapter adapter = new CategoryAdapter((MainActivity) getActivity());
         RecyclerView rvCategories = (RecyclerView) getActivity().findViewById(R.id.rv_categories);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setReverseLayout(false);

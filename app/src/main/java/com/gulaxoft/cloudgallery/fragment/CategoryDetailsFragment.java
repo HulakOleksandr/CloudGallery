@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,12 +31,12 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.gulaxoft.cloudgallery.Const;
 import com.gulaxoft.cloudgallery.R;
-import com.gulaxoft.cloudgallery.activity.MainActivity;
 import com.gulaxoft.cloudgallery.entity.Category;
 import com.gulaxoft.cloudgallery.entity.Image;
 import com.gulaxoft.cloudgallery.event.DeleteImageEvent;
 import com.gulaxoft.cloudgallery.uihelper.GalleryAdapter;
 import com.gulaxoft.cloudgallery.util.FileUtils;
+import com.gulaxoft.cloudgallery.util.GlobalData;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -117,11 +118,14 @@ public class CategoryDetailsFragment extends Fragment implements Const {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ((MainActivity) getActivity()).showBackButton();
-        mImagesDataRef = ((MainActivity) getActivity()).getImagesRef();
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mImagesDataRef = GlobalData.INSTANCE.getImagesDataRef();
 
         // load all images of this category
-        ((MainActivity) getActivity()).getCategoriesRef().child(mCategory.getId()).child(IMAGES).addListenerForSingleValueEvent(new ValueEventListener() {
+        GlobalData.INSTANCE.getCategoriesRef()
+                .child(mCategory.getId())
+                .child(IMAGES)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mCategory.getImages().clear();
@@ -155,7 +159,7 @@ public class CategoryDetailsFragment extends Fragment implements Const {
         });
 
         RecyclerView recyclerView = (RecyclerView) getActivity().findViewById(R.id.rv_images_of_category);
-        mGalleryAdapter = new GalleryAdapter(getActivity(), mCategory.getImages(), mImagesStorageRef);
+        mGalleryAdapter = new GalleryAdapter(getActivity(), mCategory.getImages());
 
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 2);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -239,7 +243,7 @@ public class CategoryDetailsFragment extends Fragment implements Const {
         }
         catUpdates.put(IMAGES, imagesLinks);
 
-        ((MainActivity) getActivity()).getCategoriesRef().child(mCategory.getId()).updateChildren(catUpdates);
+        GlobalData.INSTANCE.getCategoriesRef().child(mCategory.getId()).updateChildren(catUpdates);
         notifyDataSetChanged();
     }
 

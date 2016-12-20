@@ -7,8 +7,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.gulaxoft.cloudgallery.Const;
 import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.entity.Category;
@@ -16,9 +14,6 @@ import com.gulaxoft.cloudgallery.fragment.CategoryDetailsFragment;
 import com.gulaxoft.cloudgallery.fragment.CategoryListFragment;
 
 public class MainActivity extends AppCompatActivity implements Const {
-    private DatabaseReference mCategoriesRef;
-    private DatabaseReference mImagesRef;
-    private static boolean calledAlready;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,13 +23,6 @@ public class MainActivity extends AppCompatActivity implements Const {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        if (!calledAlready) {
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-            calledAlready = true;
-        }
-
-        mCategoriesRef = FirebaseDatabase.getInstance().getReference(CATEGORIES);
-        mImagesRef = FirebaseDatabase.getInstance().getReference(IMAGES);
 
         if (savedInstanceState == null) {
             CategoryListFragment categoryListFragment = new CategoryListFragment();
@@ -78,10 +66,6 @@ public class MainActivity extends AppCompatActivity implements Const {
         super.onSaveInstanceState(outState);
     }
 
-    public void showBackButton() {
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
     public void displayCategoryDetails(Category category) {
         CategoryDetailsFragment categoryDetailsFragment = new CategoryDetailsFragment();
         categoryDetailsFragment.init(category);
@@ -91,13 +75,5 @@ public class MainActivity extends AppCompatActivity implements Const {
         ft.addToBackStack(CAT_DETAILS_FRAGMENT);
         ft.commit();
         setTitle(category.getName());
-    }
-
-    public DatabaseReference getCategoriesRef() {
-        return mCategoriesRef;
-    }
-
-    public DatabaseReference getImagesRef() {
-        return mImagesRef;
     }
 }
