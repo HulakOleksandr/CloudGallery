@@ -1,7 +1,7 @@
 package com.gulaxoft.cloudgallery.uihelper;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +17,6 @@ import com.gulaxoft.cloudgallery.activity.MainActivity;
 import com.gulaxoft.cloudgallery.entity.Category;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by gos on 18.12.16.
@@ -27,7 +26,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> im
 
     private ArrayList<Category> items = new ArrayList<>();
     private MainActivity mActivity; // TODO refactor to remove this link
-    private Context mContext;
 
     public CategoryAdapter(DatabaseReference ref, MainActivity activity) {
         ref.addValueEventListener(new ValueEventListener() {
@@ -40,6 +38,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> im
                     category.setId(id);
                     category.setName(snapshot.child(CAT_NAME).getValue().toString());
                     category.setDescription(snapshot.child(CAT_DESC).getValue().toString());
+                    category.setLastUpdate(Long.parseLong(snapshot.child(CAT_LAST).getValue().toString()));
 
                     items.add(category);
                 }
@@ -57,7 +56,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> im
     @Override
     public CategoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.category_list_item, parent, false);
-        mContext = parent.getContext();
         return new CategoryViewHolder(view);
     }
 
@@ -65,9 +63,12 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> im
     public void onBindViewHolder(CategoryViewHolder holder, int position) {
         final Category category = items.get(position);
         holder.setName(category.getName());
-        holder.setLastUpdate(category.getLastAddedImage() != null
-                ? new Date(category.getLastAddedImage().getTimestamp() * 1000).toString()
-                : "No images");
+        if (category.getLastUpdate() == 0) {
+            holder.setLastUpdate("No images");
+        } else {
+            String date = DateFormat.format("dd.MM.yyyy", category.getLastUpdate()).toString();
+            holder.setLastUpdate(date);
+        }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

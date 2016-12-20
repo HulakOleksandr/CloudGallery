@@ -3,6 +3,8 @@ package com.gulaxoft.cloudgallery.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +25,7 @@ public class Category implements Parcelable {
     @Getter @Setter private String id;
     @Getter @Setter private String name;
     @Getter @Setter private String description;
+    @Setter @Exclude private long lastUpdate;
     @Getter @Setter @NonNull private List<Image> images = new ArrayList<Image>() {
         @Override
         public boolean add(Image object) {
@@ -43,6 +46,10 @@ public class Category implements Parcelable {
             result.add(img.getId());
         }
         return result;
+    }
+
+    public long getLastUpdate() {
+        return getLastAddedImage() == null ? lastUpdate : getLastAddedImage().getTimestamp();
     }
 
     @Override
