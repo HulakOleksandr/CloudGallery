@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -16,6 +17,9 @@ import com.google.firebase.storage.StorageReference;
 import com.gulaxoft.cloudgallery.Const;
 import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.entity.Image;
+import com.gulaxoft.cloudgallery.event.DeleteImageEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -33,12 +37,16 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ImageHol
         public ImageView thumbnail;
         public TextView tvName;
         public TextView tvDate;
+        public ImageView btnDelete;
+        public ProgressBar progressBar;
 
         public ImageHolder(View view) {
             super(view);
             thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
             tvName = (TextView) view.findViewById(R.id.tv_name);
             tvDate = (TextView) view.findViewById(R.id.tv_date);
+            btnDelete = (ImageView) view.findViewById(R.id.img_delete);
+            progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         }
     }
 
@@ -58,7 +66,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ImageHol
 
     @Override
     public void onBindViewHolder(final ImageHolder holder, int position) {
-        Image image = mImages.get(position);
+        final Image image = mImages.get(position);
 
         Glide.with(mContext)
                 .using(new FirebaseImageLoader())
@@ -71,6 +79,13 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ImageHol
         holder.tvName.setText(image.getName());
         String date = DateFormat.format("dd.MM.yyyy", image.getTimestamp()).toString();
         holder.tvDate.setText(date);
+
+        holder.btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new DeleteImageEvent(image));
+            }
+        });
 
 //        // TODO Fix fullscreen viewing
 //        holder.thumbnail.setOnClickListener(new View.OnClickListener() {

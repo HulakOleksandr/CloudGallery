@@ -67,7 +67,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryViewHolder> im
             holder.setLastUpdate("No images");
         } else {
             String date = DateFormat.format("dd.MM.yyyy", category.getLastUpdate()).toString();
-            holder.setLastUpdate(date);
+            holder.setLastUpdate(mActivity.getString(R.string.ph_date, date));
         }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

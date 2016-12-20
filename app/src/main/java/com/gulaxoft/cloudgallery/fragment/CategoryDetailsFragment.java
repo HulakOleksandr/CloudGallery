@@ -33,8 +33,13 @@ import com.gulaxoft.cloudgallery.R;
 import com.gulaxoft.cloudgallery.activity.MainActivity;
 import com.gulaxoft.cloudgallery.entity.Category;
 import com.gulaxoft.cloudgallery.entity.Image;
+import com.gulaxoft.cloudgallery.event.DeleteImageEvent;
 import com.gulaxoft.cloudgallery.uihelper.GalleryAdapter;
 import com.gulaxoft.cloudgallery.util.FileUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,6 +84,18 @@ public class CategoryDetailsFragment extends Fragment implements Const {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_choose_a_photo:
@@ -114,10 +131,13 @@ public class CategoryDetailsFragment extends Fragment implements Const {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Image image = dataSnapshot.getValue(Image.class);
-                            image.setId(id);
-                            if (mCategory.getImages().contains(image)) mCategory.getImages().remove(image);
-                            mCategory.getImages().add(image);
-                            notifyDataSetChanged();
+                            if (image != null) {
+                                image.setId(id);
+                                if (mCategory.getImages().contains(image))
+                                    mCategory.getImages().remove(image);
+                                mCategory.getImages().add(image);
+                                notifyDataSetChanged();
+                            }
                         }
 
                         @Override
@@ -220,6 +240,16 @@ public class CategoryDetailsFragment extends Fragment implements Const {
         catUpdates.put(IMAGES, imagesLinks);
 
         ((MainActivity) getActivity()).getCategoriesRef().child(mCategory.getId()).updateChildren(catUpdates);
+        notifyDataSetChanged();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDeleteImageEvent(DeleteImageEvent event) {
+        Image image = event.getImage();
+        mCategory.getImages().remove(image);
+        mImagesDataRef.child(image.getId()).removeValue();
+        mImagesStorageRef.child(image.getFileName()).delete();
+        updateCategory();
         notifyDataSetChanged();
     }
 

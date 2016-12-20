@@ -32,6 +32,7 @@ dependencies {
     compile 'com.google.firebase:firebase-auth:10.0.1'
     compile 'com.firebaseui:firebase-ui-database:1.0.1'
     compile 'com.firebaseui:firebase-ui-storage:1.0.1'
+    compile 'org.greenrobot:eventbus:3.0.0'
     compile 'org.projectlombok:lombok:1.16.10'
     testCompile 'junit:junit:4.12'
 }
