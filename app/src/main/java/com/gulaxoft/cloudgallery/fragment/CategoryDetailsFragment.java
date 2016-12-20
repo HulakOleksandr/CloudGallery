@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -116,7 +117,7 @@ public class CategoryDetailsFragment extends Fragment implements Const {
                             image.setId(id);
                             if (mCategory.getImages().contains(image)) mCategory.getImages().remove(image);
                             mCategory.getImages().add(image);
-                            mGalleryAdapter.notifyDataSetChanged();
+                            notifyDataSetChanged();
                         }
 
                         @Override
@@ -140,6 +141,8 @@ public class CategoryDetailsFragment extends Fragment implements Const {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mGalleryAdapter);
+
+        updateInfoViews();
     }
 
     @Override
@@ -217,6 +220,34 @@ public class CategoryDetailsFragment extends Fragment implements Const {
         catUpdates.put(IMAGES, imagesLinks);
 
         ((MainActivity) getActivity()).getCategoriesRef().child(mCategory.getId()).updateChildren(catUpdates);
+        notifyDataSetChanged();
+    }
+
+    private void notifyDataSetChanged() {
         mGalleryAdapter.notifyDataSetChanged();
+        updateInfoViews();
+    }
+
+    private void updateInfoViews() {
+        TextView tvOverall = (TextView) getActivity().findViewById(R.id.tv_overall);
+        TextView tvLast = (TextView) getActivity().findViewById(R.id.tv_last_image);
+        TextView tvNameLast = (TextView) getActivity().findViewById(R.id.tv_last_image_name);
+        TextView tvDateLast = (TextView) getActivity().findViewById(R.id.tv_last_image_date);
+
+        int imagesCount = mCategory.getImages().size();
+        tvOverall.setText(getString(R.string.ph_overall, imagesCount));
+
+        if (imagesCount == 0) {
+            tvLast.setVisibility(View.GONE);
+            tvNameLast.setVisibility(View.GONE);
+            tvDateLast.setVisibility(View.GONE);
+        } else {
+            String date = DateFormat.format("dd.MM.yyyy", mCategory.getLastAddedImage().getTimestamp()).toString();
+            tvLast.setVisibility(View.VISIBLE);
+            tvNameLast.setVisibility(View.VISIBLE);
+            tvDateLast.setVisibility(View.VISIBLE);
+            tvNameLast.setText(getString(R.string.ph_name, mCategory.getLastAddedImage().getName()));
+            tvDateLast.setText(getString(R.string.ph_date, date));
+        }
     }
 }

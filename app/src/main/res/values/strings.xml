@@ -2,4 +2,8 @@
     <string name="app_name">Cloud Gallery</string>
     <string name="add_category">Add new category</string>
     <string name="add_image">Add new image</string>
+    <string name="last">Last:</string>
+    <string name="ph_overall">Overall: %1$d</string>
+    <string name="ph_name">Name: %1$s</string>
+    <string name="ph_date">Date: %1$s</string>
 </resources>
