@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements Const {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.add(R.id.fragment, categoryListFragment, CAT_LIST_FRAGMENT);
             ft.commit();
+        } else {
+            setTitle(savedInstanceState.getString(EXTRA_TITLE));
         }
     }
 
@@ -66,6 +68,12 @@ public class MainActivity extends AppCompatActivity implements Const {
     @Override
     public void setTitle(CharSequence title) {
         ((TextView) findViewById(R.id.toolbar_title)).setText(title);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(EXTRA_TITLE, ((TextView) findViewById(R.id.toolbar_title)).getText().toString());
+        super.onSaveInstanceState(outState);
     }
 
     public void showBackButton() {

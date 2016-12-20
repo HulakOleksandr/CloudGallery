@@ -19,6 +19,7 @@ public interface Const {
     // Extras
     String EXTRA_CATEGORY = "category";
     String EXTRA_IMAGE = "image";
+    String EXTRA_TITLE = "title";
 
     // Intent
     int REQ_ADD_CATEGORY = 100;
